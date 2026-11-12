@@ -1,0 +1,42 @@
+{
+  "name": "Brightside Physiotherapy",
+  "timezone": "Europe/London",
+  "phone_for_humans": "+441615550190",
+  "cancellation_hours": 24,
+  "services": [
+    {"key": "assessment", "name": "initial assessment", "minutes": 60, "price_pence": 7000,
+     "synonyms": ["assessment", "first appointment", "first visit", "new patient", "initial", "consultation"]},
+    {"key": "followup", "name": "follow-up session", "minutes": 30, "price_pence": 4500,
+     "synonyms": ["follow up", "follow-up", "followup", "review", "second appointment", "check up", "check-up"]},
+    {"key": "massage", "name": "sports massage", "minutes": 45, "price_pence": 5500,
+     "synonyms": ["massage", "sports massage", "deep tissue", "rub"]}
+  ],
+  "practitioners": [
+    {"key": "amara", "name": "Amara", "services": ["assessment", "followup"],
+     "hours": {"0": ["08:00", "16:00"], "1": ["08:00", "16:00"], "2": ["12:00", "20:00"], "3": ["08:00", "16:00"]}},
+    {"key": "tom", "name": "Tom", "services": ["assessment", "followup", "massage"],
+     "hours": {"1": ["10:00", "18:00"], "2": ["10:00", "18:00"], "3": ["12:00", "20:00"], "4": ["08:00", "16:00"], "5": ["09:00", "13:00"]}},
+    {"key": "priya", "name": "Priya", "services": ["massage", "followup"],
+     "hours": {"0": ["12:00", "20:00"], "2": ["08:00", "14:00"], "4": ["10:00", "18:00"]}}
+  ],
+  "faqs": [
+    {"key": "parking", "keywords": ["park", "parking", "car", "drive"],
+     "answer": "There is free parking behind the clinic, and the number 42 bus stops right outside."},
+    {"key": "location", "keywords": ["where", "address", "located", "find you", "directions"],
+     "answer": "We are at 18 Mill Lane, Riverside, next to the library."},
+    {"key": "hours", "keywords": ["open", "opening", "close", "closing", "hours", "weekend", "saturday", "sunday"],
+     "answer": "We are open Monday to Friday from 8 am to 8 pm, and Saturday from 9 am to 1 pm. We are closed on Sundays."},
+    {"key": "cancellation", "keywords": ["cancellation policy", "cancel fee", "charge", "late", "miss", "no show"],
+     "answer": "Please give us 24 hours' notice to cancel or move an appointment. Late cancellations are charged in full."},
+    {"key": "insurance", "keywords": ["insurance", "insurer", "bupa", "axa", "vitality", "claim"],
+     "answer": "We are recognised by Bupa, AXA Health and Vitality. Bring your authorisation code to your first appointment."},
+    {"key": "clothing", "keywords": ["wear", "clothes", "bring", "shorts"],
+     "answer": "Wear something comfortable, such as shorts and a vest top, so we can see the area that hurts."},
+    {"key": "referral", "keywords": ["referral", "gp", "doctor", "refer"],
+     "answer": "You do not need a referral from your GP. You can book directly with us."},
+    {"key": "prices", "keywords": ["price", "prices", "cost", "how much", "fee", "fees", "charge for"],
+     "answer": "An initial assessment is £70, a follow-up session is £45 and a sports massage is £55."}
+  ],
+  "emergency_words": ["chest pain", "can't breathe", "cannot breathe", "collapsed", "unconscious", "bleeding heavily",
+    "stroke", "numb on one side", "lost control of my bladder", "suicidal", "overdose", "emergency"]
+}

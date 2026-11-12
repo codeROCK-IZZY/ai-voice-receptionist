@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: "Python ${{ matrix.python }}: lint, types, tests"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - name: Lint and format
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Type-check (strict)
+        run: mypy
+      - name: Tests (the Claude brain runs through the real SDK against canned API responses)
+        run: pytest
+
+  evaluation:
+    name: Simulated calls, guard ablation and booking race (gate)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - run: receptionist evaluate --calls 300 --gate --out "$RUNNER_TEMP/eval"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evaluation-report
+          path: ${{ runner.temp }}/eval
+
+  container:
+    name: Container answers a signed call
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t receptionist .
+      - name: Health check, a rejected forged webhook and a signed incoming call
+        run: |
+          docker run -d --name rx -p 8000:8000 -e TWILIO_AUTH_TOKEN=ci-token -e PUBLIC_URL=http://127.0.0.1:8000 receptionist
+          for i in $(seq 1 30); do curl -fs http://127.0.0.1:8000/healthz && break; sleep 2; done
+          code=$(curl -s -o /dev/null -w '%{http_code}' -d 'CallSid=CA1&From=%2B447700900142' -H 'X-Twilio-Signature: forged' http://127.0.0.1:8000/voice/incoming)
+          test "$code" = 403
+          sig=$(python3 -c "import base64,hashlib,hmac; p='http://127.0.0.1:8000/voice/incoming'+'CallSidCA1'+'From+447700900142'; print(base64.b64encode(hmac.new(b'ci-token', p.encode(), hashlib.sha1).digest()).decode())")
+          curl -fs -d 'CallSid=CA1&From=%2B447700900142' -H "X-Twilio-Signature: $sig" http://127.0.0.1:8000/voice/incoming | tee twiml.xml
+          grep -q '<Gather input="speech"' twiml.xml
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: gitleaks
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:latest git /repo --no-banner

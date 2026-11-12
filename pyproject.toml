@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "voice-receptionist"
+version = "1.0.0"
+description = "An AI phone receptionist: Twilio webhooks, an offline dialogue engine and a Claude agent behind guarded booking tools."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = ["anthropic>=2.0", "fastapi>=0.110", "uvicorn>=0.29", "python-multipart>=0.0.9", "tzdata>=2024.1"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11", "httpx>=0.27"]
+
+[project.scripts]
+receptionist = "receptionist.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+receptionist = ["demo_business.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "PL", "PT"]
+ignore = ["PLR0913", "PLR2004", "PLR0911", "PLR0912", "PLR0915", "PLC0415", "PLR0917", "RUF001", "PLW2901", "RUF003"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["src"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["PT018"]
+"src/receptionist/report.py" = ["E501"]
+"src/receptionist/telephony.py" = ["E501"]
